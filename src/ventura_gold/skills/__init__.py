@@ -1,1 +1,1 @@
-"""Domain skills."""
+"""Skills package — domains: repository, codegen, testing, docs, review."""
