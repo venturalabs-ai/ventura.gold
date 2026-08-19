@@ -1,10 +1,9 @@
-"""Servidor MCP-style — filesystem com proteção de path traversal."""
-
+"""MCP server — filesystem with path sandboxing."""
 from __future__ import annotations
 
 import ast
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 class FileSystemServer:
@@ -14,7 +13,7 @@ class FileSystemServer:
     def _safe_path(self, rel_path: str) -> Path:
         full = (self.root / rel_path).resolve()
         if not str(full).startswith(str(self.root)):
-            raise PermissionError(f"Caminho fora do repositório: {rel_path}")
+            raise PermissionError(f"Caminho fora do repositorio: {rel_path}")
         return full
 
     def list_dir(self, rel_path: str = ".", pattern: str = "*") -> List[str]:
@@ -33,19 +32,17 @@ class FileSystemServer:
         path.write_text(content, encoding="utf-8")
         return True
 
-    def analyze_python(self, rel_path: str) -> Dict:
+    def analyze_python(self, rel_path: str) -> Dict[str, Any]:
         code = self.read(rel_path)
-        if not code:
-            return {"error": "Arquivo não encontrado", "valid_syntax": False}
+        if code is None:
+            return {"error": "Arquivo nao encontrado", "valid_syntax": False}
         try:
             tree = ast.parse(code)
             return {
                 "file": rel_path,
                 "classes": [n.name for n in ast.walk(tree) if isinstance(n, ast.ClassDef)],
                 "functions": [n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)],
-                "imports": len(
-                    [n for n in ast.walk(tree) if isinstance(n, (ast.Import, ast.ImportFrom))]
-                ),
+                "imports": len([n for n in ast.walk(tree) if isinstance(n, (ast.Import, ast.ImportFrom))]),
                 "lines": len(code.splitlines()),
                 "valid_syntax": True,
             }

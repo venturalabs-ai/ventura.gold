@@ -1,9 +1,8 @@
-"""Skill: Gerador de Código."""
-
+"""Skill: code generator — uses LLM client with local fallback."""
 from __future__ import annotations
 
 import re
-from typing import Dict
+from typing import Any, Dict
 
 from ventura_gold.core.llm_client import LLMClient
 
@@ -12,27 +11,18 @@ class CodeGeneratorSkill:
     def __init__(self, llm: LLMClient):
         self.llm = llm
         self.system_prompt = (
-            "Você é um engenheiro de software sênior especialista em Python. "
-            "Gere código limpo, tipado e documentado. Sem segredos hardcoded. "
-            "Use bloco ```python ... ```."
+            "Voce e um engenheiro de software senior especialista em Python. "
+            "Codigo limpo, tipado, documentado, sem segredos hardcoded."
         )
 
-    def create_module(self, spec: str) -> Dict:
-        resp = self.llm.generate(spec, self.system_prompt)
+    async def create_module(self, spec: str) -> Dict[str, Any]:
+        resp = await self.llm.generate(spec, self.system_prompt)
         return {
             "success": resp.success,
             "content": self._extract_code(resp.text),
             "explanation": self._strip_code(resp.text),
             "error": resp.error,
-        }
-
-    def improve(self, code: str, feedback: str = "") -> Dict:
-        prompt = f"Melhore este código.\nFeedback: {feedback}\n\n```python\n{code}\n```"
-        resp = self.llm.generate(prompt, self.system_prompt)
-        return {
-            "success": resp.success,
-            "improved_code": self._extract_code(resp.text),
-            "changes": self._strip_code(resp.text),
+            "mode": resp.mode,
         }
 
     def _extract_code(self, text: str) -> str:

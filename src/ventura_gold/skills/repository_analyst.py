@@ -1,9 +1,8 @@
-"""Skill: Analista de Repositório."""
-
+"""Skill: repository analyst — offline scan and markdown report."""
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from ventura_gold.mcp.server_filesystem import FileSystemServer
 from ventura_gold.mcp.server_git import GitServer
@@ -15,56 +14,59 @@ class RepositoryAnalystSkill:
         self.git = GitServer(self.repo_path)
         self.fs = FileSystemServer(self.repo_path)
 
-    def scan(self) -> Dict:
+    def scan(self) -> Dict[str, Any]:
         status = self.git.status()
         files = self.git.ls()
-        if not files and status.get("branch") in ("n/a", "error", ""):
+        if not files:
             files = [
                 str(p.relative_to(self.repo_path))
                 for p in self.repo_path.rglob("*")
-                if p.is_file() and ".git" not in p.parts and "node_modules" not in p.parts
+                if p.is_file() and ".git" not in p.parts and "__pycache__" not in p.parts
             ][:500]
-
         py_files = [f for f in files if f.endswith(".py")]
         md_files = [f for f in files if f.endswith(".md")]
-        analysis = {
+        analyses: List[Dict[str, Any]] = []
+        for f in py_files[:30]:
+            try:
+                analyses.append(self.fs.analyze_python(f))
+            except Exception as e:
+                analyses.append({"file": f, "valid_syntax": False, "error": str(e)})
+        return {
             "status": status,
             "stats": {
                 "total_files": len(files),
                 "python_files": len(py_files),
                 "markdown_files": len(md_files),
             },
-            "python_analysis": [self.fs.analyze_python(f) for f in py_files[:30]],
-            "readme_exists": any(f.upper() == "README.MD" or f == "README.md" for f in files),
+            "python_analysis": analyses,
+            "readme_exists": any(f.endswith("README.md") for f in files),
             "license_exists": any("LICENSE" in f.upper() for f in files),
             "tests_exist": any("test" in f.lower() for f in files),
-            "files_sample": files[:40],
         }
-        return analysis
 
     def generate_report(self) -> str:
         data = self.scan()
         valid = sum(1 for a in data["python_analysis"] if a.get("valid_syntax"))
         total = len(data["python_analysis"])
-        quality = f"- Sintaxe válida: {valid}/{total}" if total else "- Sem arquivos Python analisados"
-        return f"""# Relatório do Repositório
+        quality = f"- Sintaxe valida: {valid}/{total}" if total else "- Sem arquivos Python analisados"
+        return f"""# Relatorio do Repositorio
 
 ## Estado Geral
 - **Branch:** `{data['status'].get('branch')}`
 - **Commit:** `{data['status'].get('commit')}`
 - **Arquivos modificados:** {len(data['status'].get('modified') or [])}
-- **Arquivos não rastreados:** {len(data['status'].get('untracked') or [])}
+- **Arquivos nao rastreados:** {len(data['status'].get('untracked') or [])}
 
-## Estatísticas
+## Estatisticas
 - Total de arquivos: {data['stats']['total_files']}
 - Arquivos Python: {data['stats']['python_files']}
-- Documentação: {data['stats']['markdown_files']}
-- README: {'✅' if data['readme_exists'] else '❌'}
-- Licença: {'✅' if data['license_exists'] else '❌'}
-- Testes: {'✅' if data['tests_exist'] else '❌'}
+- Documentacao: {data['stats']['markdown_files']}
+- README: {'sim' if data['readme_exists'] else 'nao'}
+- Licenca: {'sim' if data['license_exists'] else 'nao'}
+- Testes: {'sim' if data['tests_exist'] else 'nao'}
 
-## Qualidade do Código
+## Qualidade do Codigo
 {quality}
 
-> Relatório gerado automaticamente por ventura.gold
+> Relatorio gerado automaticamente por ventura.gold (modo local)
 """

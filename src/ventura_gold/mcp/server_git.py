@@ -1,5 +1,4 @@
-"""Servidor MCP-style — operações Git seguras (somente leitura por padrão)."""
-
+"""MCP server — Git repository operations (local)."""
 from __future__ import annotations
 
 import subprocess
@@ -26,8 +25,8 @@ class GitServer:
 
     def status(self) -> Dict:
         return {
-            "branch": self.run_git("rev-parse", "--abbrev-ref", "HEAD") or "n/a",
-            "commit": self.run_git("rev-parse", "--short", "HEAD") or "n/a",
+            "branch": self.run_git("rev-parse", "--abbrev-ref", "HEAD") or "unknown",
+            "commit": self.run_git("rev-parse", "--short", "HEAD") or "unknown",
             "modified": [x for x in self.run_git("diff", "--name-only").splitlines() if x],
             "untracked": [
                 x
@@ -56,6 +55,4 @@ class GitServer:
         full = (self.repo_path / path).resolve()
         if not str(full).startswith(str(self.repo_path)):
             return None
-        if full.exists() and full.is_file():
-            return full.read_text(encoding="utf-8", errors="replace")
-        return None
+        return full.read_text(encoding="utf-8") if full.exists() else None
