@@ -7,9 +7,9 @@ name = "ventura.gold"
 version = "1.0.0"
 description = "Venture Gold - 100% Python framework portátil para criar, testar, executar, revisar, documentar e exportar agentes e skills para diferentes ambientes de IA"
 requires-python = ">=3.10"
-keywords = ["ai-agents", "framework", "portability", "ventura", "viral-content"]
+keywords = ["ai-agents", "framework", "portability", "ventura", "local-first"]
 classifiers = [
-    "Development Status :: 4 Beta",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -20,10 +20,13 @@ classifiers = [
 ]
 
 [project.scripts]
-ventura-gold = "venture.gold.cli:main"
+ventura-gold = "cli.__main__:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
 
 [tool.pytest.ini_options]
-testdir = "tests"
+testpaths = ["tests"]
 pythonpath = ["src"]
 
 [tool.setuptools.packages.find]
