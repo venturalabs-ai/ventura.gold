@@ -1,0 +1,8 @@
+{
+  "id": "planning",
+  "name": "Planejamento e Estruturação",
+  "description": "Organiza tarefas e planos de implementação.",
+  "capabilities": ["planejamento", "organização", "estrutura"],
+  "version": "1.0.0",
+  "author": "Ventura Labs AI"
+}
