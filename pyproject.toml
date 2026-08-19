@@ -1,33 +1,46 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ventura.gold"
 version = "1.0.0"
-description = "Venture Gold - 100% Python framework portátil para criar, testar, executar, revisar, documentar e exportar agentes e skills para diferentes ambientes de IA"
+description = "Agente de Repositório Automatizado — 100% Python, local-first, MCP-style tools e LLM opcional"
+readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.10"
-keywords = ["ai-agents", "framework", "portability", "ventura", "local-first"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Operating System :: OS Independent",
+authors = [{name = "Ventura Labs AI"}]
+keywords = [
+  "ai-agents", "llm", "agent-framework", "local-first", "portable",
+  "claude", "chatgpt", "gemini", "mistral", "automation", "repository",
+  "code-generation", "mcp"
 ]
-
-[project.scripts]
-ventura-gold = "cli.__main__:main"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+  "typer>=0.12.0",
+  "httpx>=0.27.0",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
+[project.scripts]
+ventura-gold = "ventura_gold.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+ventura_gold = ["agents/*.json", "skills/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

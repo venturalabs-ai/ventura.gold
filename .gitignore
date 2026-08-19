@@ -1,31 +1,13 @@
-# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-
-# Distribution / packaging
+*.py[cod]
+*.egg-info/
 dist/
 build/
-*.egg-info/
+.venv/
 venv/
-env/
-.tox/
-
-# Environment variables
 .env
 .env.*
 !.env.example
-
-# IDE
-.vscode/
-.idea/
-
-# OS
+.pytest_cache/
+.mypy_cache/
 .DS_Store
-/Local*/
-
-# Project specific
-*.session
-*.local
