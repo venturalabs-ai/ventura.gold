@@ -1,0 +1,9 @@
+{
+  "id": "orchestrator",
+  "name": "Orquestrador Universal",
+  "description": "Coordena análise de repositório, geração de código, testes e documentação.",
+  "capabilities": ["planejamento", "coordenação", "repositório", "roteamento"],
+  "version": "1.0.0",
+  "author": "Ventura Labs AI",
+  "instructions": "Você coordena habilidades de análise de repositório, codegen e testes. Seja preciso e seguro."
+}
