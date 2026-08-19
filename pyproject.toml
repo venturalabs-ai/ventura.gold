@@ -5,16 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ventura.gold"
 version = "1.0.0"
-description = "Agente de Repositório Automatizado — 100% Python, local-first, MCP-style tools e LLM opcional"
+description = "Agente de repositorio automatizado — 100% Python, local-first, MCP e integracao LLM opcional"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [{name = "Ventura Labs AI"}]
-keywords = [
-  "ai-agents", "llm", "agent-framework", "local-first", "portable",
-  "claude", "chatgpt", "gemini", "mistral", "automation", "repository",
-  "code-generation", "mcp"
-]
+keywords = ["ai-agents", "llm", "agent-framework", "local-first", "portable", "mcp", "repository"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -31,6 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
+tokens = ["tiktoken>=0.7.0"]
 
 [project.scripts]
 ventura-gold = "ventura_gold.cli:app"

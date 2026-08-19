@@ -1,14 +1,23 @@
 # ventura.gold
 
-**Agente de Repositório Automatizado — 100% Python, local-first**
+**Agente de repositorio automatizado — 100% Python, local-first.**
 
-Framework para analisar repositórios, montar planos de agentes/skills, exportar pacotes portáteis e (opcionalmente) integrar LLMs.
+> Offline by default. Optional LLM APIs. MCP-style local tools for Git and filesystem.
 
-> **Local-first by design:** execução offline, sem autenticação obrigatória. APIs de IA permanecem opcionais.
+## Features
+
+- Local-first runtime (no login required)
+- Deterministic agent/skill routing
+- Repository scan (`ventura-gold repo scan`)
+- Optional multi-provider LLM client
+- Portable export package
+- CI with tests + secret pattern scan
 
 ## Install
 
 ```bash
+git clone https://github.com/venturalabs-ai/ventura.gold.git
+cd ventura.gold
 pip install -e ".[dev]"
 ```
 
@@ -19,20 +28,12 @@ ventura-gold doctor
 ventura-gold list
 ventura-gold validate
 ventura-gold export
-ventura-gold run --prompt "planejar refatoração"
+ventura-gold run --prompt "planejar analise do repositorio"
 ventura-gold repo scan
-ventura-gold repo generate-code --spec "módulo de cache LRU"
+ventura-gold repo generate-code --spec "modulo utilitario X"
 ventura-gold repo generate-tests --file src/ventura_gold/core/router.py
 ```
 
-## Architecture
-
-- `core/` — registry, router, runtime, exporter, validator, llm_client, context
-- `mcp/` — Git + filesystem tool servers
-- `skills/` — repository analyst, code generator, test builder
-- `adapters/` — platform adapters (export + optional API)
-- `cli.py` — Typer CLI
-
 ## License
 
-MIT
+MIT (c) Ventura Labs AI
