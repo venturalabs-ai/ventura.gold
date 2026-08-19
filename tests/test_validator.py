@@ -1,8 +1,6 @@
-from pathlib import Path
-from ventura_gold.core.validator import validate_all
+from ventura_gold.core.validator import validate_project
 
 
-def test_validate_all():
-    errors, warnings = validate_all(Path.cwd())
-    assert isinstance(errors, list)
-    assert isinstance(warnings, list)
+def test_validate():
+    r = validate_project()
+    assert "valid" in r

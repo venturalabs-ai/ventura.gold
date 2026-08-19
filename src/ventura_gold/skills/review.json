@@ -1,0 +1,9 @@
+{
+  "id": "review",
+  "name": "Revisao e Aprimoramento",
+  "description": "Avalia qualidade e sugere melhorias.",
+  "capabilities": ["revisao", "qualidade"],
+  "version": "1.0.0",
+  "author": "Ventura Labs AI",
+  "instructions": "Avalia qualidade e sugere melhorias."
+}

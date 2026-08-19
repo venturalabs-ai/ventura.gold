@@ -1,10 +1,10 @@
-"""Adapter: ChatGPT."""
-
+"""Adapter: ChatGPT (OpenAI)."""
 ADAPTER = {
     "id": "chatgpt",
-    "name": "ChatGPT",
+    "name": "ChatGPT (OpenAI)",
     "outputFormat": "markdown",
     "integrationType": "instructions-export-only",
     "apiEnvVar": "OPENAI_API_KEY",
-    "limitations": "Export/local first. API opcional se chave estiver no ambiente.",
+    "limitations": "Exporta instrucoes para copia manual; API opcional via LLMClient.",
+    "steps": "Instrucoes personalizadas.",
 }

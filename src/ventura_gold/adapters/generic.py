@@ -1,10 +1,10 @@
-"""Adapter: Genérico."""
-
+"""Adapter: Generico."""
 ADAPTER = {
     "id": "generic",
-    "name": "Genérico",
+    "name": "Generico",
     "outputFormat": "markdown",
     "integrationType": "instructions-export-only",
     "apiEnvVar": None,
-    "limitations": "Export/local first. API opcional se chave estiver no ambiente.",
+    "limitations": "Exporta instrucoes para copia manual; API opcional via LLMClient.",
+    "steps": "Copiar e colar nas instrucoes de sistema.",
 }

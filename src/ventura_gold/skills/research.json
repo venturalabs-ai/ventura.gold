@@ -1,8 +1,9 @@
 {
   "id": "research",
-  "name": "Pesquisa e Sistematização",
-  "description": "Estrutura investigação e síntese de conhecimento.",
-  "capabilities": ["pesquisa", "análise", "sistematização"],
+  "name": "Pesquisa e Sistematizacao",
+  "description": "Estrutura investigacao e sintese.",
+  "capabilities": ["pesquisa", "sistematizacao"],
   "version": "1.0.0",
-  "author": "Ventura Labs AI"
+  "author": "Ventura Labs AI",
+  "instructions": "Estrutura investigacao e sintese."
 }

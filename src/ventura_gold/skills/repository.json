@@ -1,0 +1,9 @@
+{
+  "id": "repository",
+  "name": "Analise de Repositorio",
+  "description": "Le e descreve projetos Git/codigo.",
+  "capabilities": ["repositorio", "analise", "scan"],
+  "version": "1.0.0",
+  "author": "Ventura Labs AI",
+  "instructions": "Le e descreve projetos Git/codigo."
+}

@@ -1,10 +1,10 @@
-"""Adapter: Copilot."""
-
+"""Adapter: GitHub Copilot."""
 ADAPTER = {
     "id": "copilot",
-    "name": "Copilot",
+    "name": "GitHub Copilot",
     "outputFormat": "markdown",
     "integrationType": "instructions-export-only",
     "apiEnvVar": None,
-    "limitations": "Export/local first. API opcional se chave estiver no ambiente.",
+    "limitations": "Exporta instrucoes para copia manual; API opcional via LLMClient.",
+    "steps": "Copilot instructions.",
 }

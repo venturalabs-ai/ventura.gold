@@ -1,10 +1,10 @@
-"""Adapter: Gemini."""
-
+"""Adapter: Gemini (Google)."""
 ADAPTER = {
     "id": "gemini",
-    "name": "Gemini",
+    "name": "Gemini (Google)",
     "outputFormat": "markdown",
     "integrationType": "instructions-export-only",
     "apiEnvVar": "GEMINI_API_KEY",
-    "limitations": "Export/local first. API opcional se chave estiver no ambiente.",
+    "limitations": "Exporta instrucoes para copia manual; API opcional via LLMClient.",
+    "steps": "Instrucoes do assistente.",
 }

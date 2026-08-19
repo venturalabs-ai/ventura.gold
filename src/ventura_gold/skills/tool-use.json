@@ -1,0 +1,9 @@
+{
+  "id": "tool-use",
+  "name": "Uso de Ferramentas",
+  "description": "Orienta comandos e ferramentas.",
+  "capabilities": ["ferramentas", "codigo"],
+  "version": "1.0.0",
+  "author": "Ventura Labs AI",
+  "instructions": "Orienta comandos e ferramentas."
+}

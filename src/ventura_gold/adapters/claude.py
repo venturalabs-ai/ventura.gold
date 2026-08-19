@@ -1,10 +1,10 @@
-"""Adapter: Claude."""
-
+"""Adapter: Claude (Anthropic)."""
 ADAPTER = {
     "id": "claude",
-    "name": "Claude",
+    "name": "Claude (Anthropic)",
     "outputFormat": "markdown",
     "integrationType": "instructions-export-only",
     "apiEnvVar": "ANTHROPIC_API_KEY",
-    "limitations": "Export/local first. API opcional se chave estiver no ambiente.",
+    "limitations": "Exporta instrucoes para copia manual; API opcional via LLMClient.",
+    "steps": "Instrucoes personalizadas.",
 }

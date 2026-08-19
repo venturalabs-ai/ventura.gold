@@ -7,7 +7,7 @@ def test_empty_prompt():
         run_prompt("")
 
 
-def test_local_mode(tmp_path):
-    result = run_prompt("olá", tmp_path, provider="generic")
+def test_local_run():
+    result = run_prompt("ola", provider="generic")
     assert result["mode"] == "local"
-    assert "olá" in result["instructions"].lower() or "olá" in result["instructions"]
+    assert "ola" in result["instructions"]

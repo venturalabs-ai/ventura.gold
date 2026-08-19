@@ -1,10 +1,10 @@
-"""Adapter: Grok."""
-
+"""Adapter: Grok (xAI)."""
 ADAPTER = {
     "id": "grok",
-    "name": "Grok",
+    "name": "Grok (xAI)",
     "outputFormat": "markdown",
     "integrationType": "instructions-export-only",
     "apiEnvVar": "XAI_API_KEY",
-    "limitations": "Export/local first. API opcional se chave estiver no ambiente.",
+    "limitations": "Exporta instrucoes para copia manual; API opcional via LLMClient.",
+    "steps": "Instrucao de sistema.",
 }
