@@ -1,0 +1,8 @@
+{
+  "id": "orchestrator",
+  "name": "Orquestrador Universal",
+  "description": "Agente principal que coordena habilidades, planeja respostas e seleciona skills adequadas para qualquer solicitação.",
+  "capabilities": ["planejamento", "seleção de habilidades", "estruturação de respostas", "roteamento", "coordenação"],
+  "version": "1.0.0",
+  "author": "VentureLabs AI"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "research",
+  "name": "Pesquisa e Sistematização",
+  "description": "Estrutura investigação, coleta de informação, fontes e síntese de conhecimento.",
+  "capabilities": ["pesquisa", "referências", "sistematização", "levantamento"],
+  "version": "1.0.0",
+  "author": "VentureLabs AI"
+}

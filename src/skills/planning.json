@@ -1,0 +1,8 @@
+{
+  "id": "planning",
+  "name": "Planejamento e Estruturação",
+  "description": "Ajuda a planejar, organizar, dividir em passos e estruturar qualquer tarefa, projeto ou resposta.",
+  "capabilities": ["planejamento", "organização", "estrutura", "etapas"],
+  "version": "1.0.0",
+  "author": "VentureLabs AI"
+}

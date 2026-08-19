@@ -1,0 +1,8 @@
+{
+  "id": "review",
+  "name": "Revisão e Aprimoramento",
+  "description": "Avalia clareza, precisão, estrutura, segurança e sugere melhorias.",
+  "capabilities": ["revisão", "aprimoramento", "qualidade", "correção"],
+  "version": "1.0.0",
+  "author": "VentureLabs AI"
+}

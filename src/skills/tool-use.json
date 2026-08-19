@@ -1,0 +1,8 @@
+{
+  "id": "tool-use",
+  "name": "Uso de Ferramentas e Código",
+  "description": "Orienta uso de comandos, código, instalação e ferramentas de desenvolvimento.",
+  "capabilities": ["ferramentas", "código", "comandos", "instalação", "desenvolvimento"],
+  "version": "1.0.0",
+  "author": "VentureLabs AI"
+}
