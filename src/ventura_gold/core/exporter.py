@@ -1,5 +1,4 @@
-"""Exportação de pacote portátil."""
-
+"""Export portable package."""
 from __future__ import annotations
 
 import json
@@ -10,9 +9,9 @@ from .registry import discover_agents, discover_skills, list_adapters
 
 
 def export_package(root: Optional[Path] = None) -> str:
-    root = root or Path.cwd()
-    agents = discover_agents(root)
-    skills = discover_skills(root)
+    root = (root or Path.cwd()).resolve()
+    agents = discover_agents()
+    skills = discover_skills()
     adapters = list_adapters()
     pkg: Dict[str, Any] = {
         "format": "ventura-agent-package/v1",
@@ -21,25 +20,11 @@ def export_package(root: Optional[Path] = None) -> str:
         "authentication": "none-for-local-runtime",
         "portability": adapters,
         "agents": [
-            {
-                "id": a.get("id"),
-                "name": a.get("name"),
-                "description": a.get("description"),
-                "capabilities": a.get("capabilities", []),
-                "version": a.get("version"),
-                "author": a.get("author"),
-            }
+            {k: a.get(k) for k in ("id", "name", "description", "capabilities", "version", "author")}
             for a in agents
         ],
         "skills": [
-            {
-                "id": s.get("id"),
-                "name": s.get("name"),
-                "description": s.get("description"),
-                "capabilities": s.get("capabilities", []),
-                "version": s.get("version"),
-                "author": s.get("author"),
-            }
+            {k: s.get(k) for k in ("id", "name", "description", "capabilities", "version", "author")}
             for s in skills
         ],
         "adapters": adapters,
