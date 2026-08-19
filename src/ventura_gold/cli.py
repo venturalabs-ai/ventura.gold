@@ -1,7 +1,9 @@
-"""ventura.gold — CLI: framework + agente de repositório."""
-
+#!/usr/bin/env python3
+"""ventura.gold — local-first repository agent CLI."""
 from __future__ import annotations
 
+import asyncio
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -17,8 +19,8 @@ from ventura_gold.skills.code_generator import CodeGeneratorSkill
 from ventura_gold.skills.repository_analyst import RepositoryAnalystSkill
 from ventura_gold.skills.test_builder import TestBuilderSkill
 
-app = typer.Typer(help="ventura.gold — Agente de Repositório Automatizado (local-first)", no_args_is_help=True)
-repo_app = typer.Typer(help="Análise e automação de repositório")
+app = typer.Typer(help="ventura.gold — Agente de Repositorio (local-first)", no_args_is_help=True)
+repo_app = typer.Typer(help="Analise e automacao de repositorio")
 app.add_typer(repo_app, name="repo")
 
 
@@ -26,110 +28,107 @@ def get_llm(provider: str = "generic") -> LLMClient:
     return LLMClient(provider=provider)
 
 
-@app.command()
-def run(
-    prompt: str = typer.Option(..., "--prompt", "-p", help="Solicitação para o agente"),
-    provider: str = typer.Option("generic", "--llm", help="Provedor: generic, claude, chatgpt, grok, ..."),
+@app.command("run")
+def run_cmd(
+    prompt: str = typer.Option(..., "--prompt", "-p", help="Solicitacao para o agente"),
+    provider: str = typer.Option("generic", "--llm", help="Provedor: generic, claude, chatgpt, ..."),
 ):
-    """Executa agente com a solicitação fornecida."""
+    """Executa agente (plano local; API opcional)."""
     result = run_prompt(prompt, Path.cwd(), provider)
-    typer.echo(f"\n✅ Agente selecionado: {result.get('agent') or 'Nenhum'}")
-    typer.echo(f"🧠 Motivo: {result.get('reason', '')}")
+    typer.echo(f"\nOK Agente selecionado: {result.get('agent') or 'Nenhum'}")
+    typer.echo(f"Motivo: {result.get('reason', '')}")
     typer.echo("\n" + "=" * 60)
     typer.echo(result.get("instructions", ""))
     typer.echo("=" * 60)
     if result.get("mode") == "local":
-        typer.echo("\nℹ️  [MODO LOCAL] — sem chamada de API. Instruções prontas para copiar.")
-    else:
-        typer.echo(f"\n🤖 Resposta de {provider}:")
-        typer.echo(result.get("response") or "(vazio)")
+        typer.echo("\n[MODO LOCAL] — sem chamada de API. Instrucoes prontas para usar.")
+    elif result.get("response"):
+        typer.echo(f"\nResposta de {provider}:")
+        typer.echo(result["response"])
 
 
 @app.command("list")
 def list_cmd():
     """Lista agentes, skills e adaptadores."""
-    agents = discover_agents(Path.cwd())
-    skills = discover_skills(Path.cwd())
+    agents = discover_agents()
+    skills = discover_skills()
     adapters = list_adapters()
-    typer.echo(f"\n🤖 Agentes ({len(agents)}):")
+    typer.echo(f"\nAgentes ({len(agents)}):")
     for a in agents:
-        typer.echo(f"  • {a.get('id')}: {a.get('name')}")
-    typer.echo(f"\n📚 Skills ({len(skills)}):")
+        typer.echo(f"  - {a.get('id')}: {a.get('name')}")
+    typer.echo(f"\nSkills ({len(skills)}):")
     for s in skills:
-        typer.echo(f"  • {s.get('id')}: {s.get('name')}")
-    typer.echo(f"\n🔌 Adaptadores ({len(adapters)}):")
-    for name in adapters:
-        typer.echo(f"  • {name}")
+        typer.echo(f"  - {s.get('id')}: {s.get('name')}")
+    typer.echo(f"\nAdaptadores ({len(adapters)}):")
+    for a in adapters:
+        typer.echo(f"  - {a}")
 
 
-@app.command()
-def validate():
+@app.command("validate")
+def validate_cmd():
     """Valida integridade do projeto."""
     errors, warnings = validate_all(Path.cwd())
     if errors:
-        typer.echo("\n❌ ERROS:", err=True)
+        typer.echo("\nERROS:", err=True)
         for e in errors:
-            typer.echo(f"  ✗ {e}", err=True)
+            typer.echo(f"  x {e}", err=True)
         raise typer.Exit(1)
     if warnings:
-        typer.echo("\n⚠️ Avisos:")
+        typer.echo("\nAvisos:")
         for wmsg in warnings:
-            typer.echo(f"  • {wmsg}")
-    typer.echo("\n✅ Validação aprovada")
+            typer.echo(f"  - {wmsg}")
+    typer.echo("\nValidacao aprovada")
 
 
-@app.command()
-def doctor():
-    """Diagnóstico do ambiente."""
-    import os
-
-    api_keys = [k for k in os.environ if k.endswith("_API_KEY")]
-    agents = discover_agents(Path.cwd())
-    skills = discover_skills(Path.cwd())
+@app.command("doctor")
+def doctor_cmd():
+    """Diagnostico do ambiente."""
+    agents = discover_agents()
+    skills = discover_skills()
     adapters = list_adapters()
-    typer.echo("🏥 Diagnóstico do ambiente:\n")
-    typer.echo(f"✅ Python: {sys.version.split()[0]}")
-    typer.echo("✅ Modo local: SEM AUTENTICAÇÃO OBRIGATÓRIA")
-    typer.echo(f"✅ Agentes: {len(agents)} | Skills: {len(skills)} | Adaptadores: {len(adapters)}")
+    api_keys = [k for k in os.environ if k.endswith("_API_KEY")]
+    typer.echo("Diagnostico do ambiente:\n")
+    typer.echo(f"Python: {sys.version.split()[0]}")
+    typer.echo("Modo local: SEM AUTENTICACAO OBRIGATORIA")
+    typer.echo(f"Agentes: {len(agents)} | Skills: {len(skills)} | Adaptadores: {len(adapters)}")
     if api_keys:
-        typer.echo(f"ℹ️  Chaves de API configuradas: {', '.join(api_keys)}")
+        typer.echo(f"Chaves de API configuradas: {', '.join(api_keys)}")
     else:
-        typer.echo("ℹ️  Nenhuma chave de API — modo local funcionando")
-    typer.echo("\n✅ Sistema pronto.")
+        typer.echo("Nenhuma chave de API — modo local funcionando")
+    typer.echo("\nSistema pronto.")
 
 
-@app.command()
-def export():
-    """Gera pacote portátil JSON."""
+@app.command("export")
+def export_cmd():
+    """Gera pacote portatil JSON."""
     path = export_package(Path.cwd())
-    typer.echo(f"✅ Pacote gerado: {path}")
+    typer.echo(f"Pacote gerado: {path}")
 
 
 @repo_app.command("scan")
 def repo_scan():
-    """Analisa e gera relatório completo do repositório."""
+    """Analisa e gera relatorio do repositorio (offline)."""
     skill = RepositoryAnalystSkill(Path.cwd())
     typer.echo(skill.generate_report())
 
 
 @repo_app.command("generate-code")
 def generate_code(
-    spec: str = typer.Option(..., "--spec", "-s", help="Especificação do código"),
+    spec: str = typer.Option(..., "--spec", "-s", help="Especificacao do codigo"),
     provider: str = typer.Option("generic", "--llm", help="Provedor de IA"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Salvar em arquivo"),
 ):
-    """Gera código Python a partir de especificação (API opcional)."""
+    """Gera codigo Python a partir de especificacao."""
     skill = CodeGeneratorSkill(get_llm(provider))
-    result = skill.create_module(spec)
-    if not result["success"]:
-        typer.echo(f"⚠️ Modo local / falha API: {result.get('error')}")
-    if result.get("explanation"):
-        typer.echo(result["explanation"])
-    typer.echo("\n📝 Código Gerado:")
-    typer.echo(f"```python\n{result['content']}\n```")
-    if output:
+    result = asyncio.run(skill.create_module(spec))
+    typer.echo(result.get("explanation") or "")
+    typer.echo("\nCodigo:")
+    typer.echo(result.get("content") or "")
+    if result.get("mode") == "local":
+        typer.echo("\nModo local — cole o prompt em uma IA ou configure *_API_KEY.")
+    if output and result.get("content"):
         output.write_text(result["content"], encoding="utf-8")
-        typer.echo(f"\n✅ Salvo em: {output}")
+        typer.echo(f"\nSalvo em: {output}")
 
 
 @repo_app.command("generate-tests")
@@ -138,20 +137,30 @@ def generate_tests(
     provider: str = typer.Option("generic", "--llm", help="Provedor de IA"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Arquivo de teste"),
 ):
-    """Gera testes automaticamente para um arquivo Python (API opcional)."""
+    """Gera testes (API opcional; modo local devolve template)."""
+    if not file.exists():
+        typer.echo(f"Arquivo nao encontrado: {file}", err=True)
+        raise typer.Exit(1)
     skill = TestBuilderSkill(get_llm(provider))
     code = file.read_text(encoding="utf-8")
-    result = skill.generate_tests(code, module_name=file.stem)
-    if not result.get("test_code"):
-        typer.echo("⚠️ Modo local — sem chave de IA ou sem bloco de código. Teste não gerado via LLM.")
-        typer.echo(result.get("explanation") or result.get("error") or "")
-        return
-    if result.get("explanation"):
-        typer.echo(result["explanation"])
-    typer.echo(f"\n🧪 Testes:\n```python\n{result['test_code']}\n```")
-    if output:
+    result = asyncio.run(skill.generate_tests(code, module_name=file.stem))
+    if result.get("mode") == "local" and not result.get("test_code"):
+        template = (
+            f'"""Tests for {file.stem} — gerado em modo local."""\n'
+            "import pytest\n\n"
+            f"# TODO: implement tests for {file.stem}\n"
+            f"# Fonte: {file}\n\n"
+            "def test_placeholder():\n"
+            "    assert True\n"
+        )
+        result["test_code"] = template
+        result["explanation"] = "Template local (sem chave de API)."
+    typer.echo(result.get("explanation") or "")
+    typer.echo("\nTestes:\n")
+    typer.echo(result.get("test_code") or "")
+    if output and result.get("test_code"):
         output.write_text(result["test_code"], encoding="utf-8")
-        typer.echo(f"✅ Salvo em: {output}")
+        typer.echo(f"Salvo em: {output}")
 
 
 def main() -> None:

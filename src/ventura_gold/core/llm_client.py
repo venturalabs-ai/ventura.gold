@@ -1,5 +1,4 @@
-"""Cliente LLM unificado — API opcional; fallback local sem chave."""
-
+"""Unified LLM client — optional API; local mode is default and always works."""
 from __future__ import annotations
 
 import os
@@ -15,15 +14,15 @@ class LLMResponse:
     tokens_used: int = 0
     success: bool = True
     error: Optional[str] = None
+    mode: str = "local"
 
 
 class LLMClient:
-    """Interface unificada. Sem chave = modo local (não chama API)."""
+    """Transparent multi-provider client with local fallback (no API required)."""
 
     PROVIDERS = {
         "claude": ("ANTHROPIC_API_KEY", "https://api.anthropic.com/v1/messages"),
         "chatgpt": ("OPENAI_API_KEY", "https://api.openai.com/v1/chat/completions"),
-        "openai": ("OPENAI_API_KEY", "https://api.openai.com/v1/chat/completions"),
         "gemini": ("GEMINI_API_KEY", None),
         "mistral": ("MISTRAL_API_KEY", "https://api.mistral.ai/v1/chat/completions"),
         "deepseek": ("DEEPSEEK_API_KEY", "https://api.deepseek.com/v1/chat/completions"),
@@ -35,8 +34,7 @@ class LLMClient:
 
     def __init__(self, provider: str = "generic", model: Optional[str] = None):
         self.provider = (provider or "generic").lower()
-        env_name, endpoint = self.PROVIDERS.get(self.provider, (None, None))
-        self.endpoint = endpoint
+        env_name, self.endpoint = self.PROVIDERS.get(self.provider, (None, None))
         self.api_key = os.getenv(env_name) if env_name else None
         self.model = model or self._default_model()
         self.mode = "api" if self.api_key and self.endpoint else "local"
@@ -45,7 +43,6 @@ class LLMClient:
         defaults = {
             "claude": "claude-3-5-sonnet-20241022",
             "chatgpt": "gpt-4o",
-            "openai": "gpt-4o",
             "gemini": "gemini-2.0-flash",
             "mistral": "mistral-large-latest",
             "deepseek": "deepseek-chat",
@@ -55,18 +52,18 @@ class LLMClient:
         }
         return defaults.get(self.provider, "instruction-model")
 
-    def generate(self, prompt: str, system_prompt: str = "", **kwargs: Any) -> LLMResponse:
+    async def generate(self, prompt: str, system_prompt: str = "", **kwargs: Any) -> LLMResponse:
         if self.mode == "local":
             text = (
                 "[MODO LOCAL — sem chamada à API]\n\n"
-                f"{system_prompt}\n\n{prompt}" if system_prompt else f"[MODO LOCAL]\n\n{prompt}"
-            )
+                f"{system_prompt.strip()}\n\n{prompt.strip()}"
+            ).strip()
             return LLMResponse(
                 text=text,
                 model=self.model,
                 provider=self.provider,
-                success=False,
-                error="no_api_key",
+                success=True,
+                mode="local",
             )
 
         try:
@@ -74,10 +71,12 @@ class LLMClient:
 
             headers = self._headers()
             payload = self._payload(prompt, system_prompt, **kwargs)
-            with httpx.Client(timeout=120.0) as client:
-                resp = client.post(self.endpoint, headers=headers, json=payload)
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                resp = await client.post(self.endpoint, headers=headers, json=payload)
                 resp.raise_for_status()
-                return self._parse_response(resp.json())
+                parsed = self._parse_response(resp.json())
+                parsed.mode = "api"
+                return parsed
         except Exception as e:
             return LLMResponse(
                 text="",
@@ -85,7 +84,13 @@ class LLMClient:
                 provider=self.provider,
                 success=False,
                 error=str(e),
+                mode="api",
             )
+
+    def generate_sync(self, prompt: str, system_prompt: str = "", **kwargs: Any) -> LLMResponse:
+        import asyncio
+
+        return asyncio.run(self.generate(prompt, system_prompt, **kwargs))
 
     def _headers(self) -> Dict[str, str]:
         if self.provider == "claude":
@@ -102,16 +107,13 @@ class LLMClient:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
         if self.provider == "claude":
-            body: Dict[str, Any] = {
-                "model": self.model,
-                "max_tokens": kwargs.pop("max_tokens", 4096),
-                "messages": messages,
-            }
+            body: Dict[str, Any] = {"model": self.model, "max_tokens": 4096, "messages": messages}
+            if system:
+                body["system"] = system
+                body["messages"] = [{"role": "user", "content": prompt}]
             body.update(kwargs)
             return body
-        body = {"model": self.model, "messages": messages}
-        body.update(kwargs)
-        return body
+        return {"model": self.model, "messages": messages, **kwargs}
 
     def _parse_response(self, data: Dict[str, Any]) -> LLMResponse:
         if self.provider == "claude":
@@ -119,11 +121,11 @@ class LLMClient:
         else:
             content = data["choices"][0]["message"]["content"]
         usage = data.get("usage") or {}
-        tokens = usage.get("total_tokens", 0)
+        tokens = usage.get("total_tokens") or usage.get("output_tokens") or 0
         return LLMResponse(
             text=content,
             model=self.model,
             provider=self.provider,
-            tokens_used=tokens,
+            tokens_used=int(tokens),
             success=True,
         )
