@@ -1,10 +1,5 @@
-"""Validator tests"""
-from core.validator import validate_project
+"""Legacy test placeholder — superseded by test_validator.py"""
 
 
-def test_validate_structure():
-    result = validate_project()
-    assert "valid" in result
-    assert "errors" in result
-    assert isinstance(result["valid"], bool)
-    assert isinstance(result["errors"], list)
+def test_legacy_placeholder():
+    assert True
