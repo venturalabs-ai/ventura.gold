@@ -1,1 +1,1 @@
-"""Domain skills for repository automation."""
+"""Domain skills."""

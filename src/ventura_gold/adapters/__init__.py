@@ -1,1 +1,1 @@
-"""LLM platform adapters (instructions-export-only + optional API)."""
+"""LLM adapters (instructions-export-only by default)."""

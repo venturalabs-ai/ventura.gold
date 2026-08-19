@@ -1,1 +1,1 @@
-"""MCP-style tool servers (git + filesystem)."""
+"""MCP tool servers (local)."""
