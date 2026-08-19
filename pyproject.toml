@@ -36,7 +36,7 @@ ventura-gold = "ventura_gold.cli:app"
 where = ["src"]
 
 [tool.setuptools.package-data]
-ventura_gold = ["agents/*.json", "skills/*.json"]
+ventura_gold = ["agents/*.md", "agents/*.json", "skills/**/*.md", "skills/**/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
