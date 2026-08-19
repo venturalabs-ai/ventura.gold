@@ -1,5 +1,4 @@
-"""Runtime local — monta plano/instruções; LLM opcional via LLMClient."""
-
+"""Local runtime — builds plans; optional LLM call via client."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -20,37 +19,33 @@ def run_prompt(
     if len(prompt) > 100_000:
         raise ValueError("Prompt excedeu 100.000 caracteres")
 
-    root = root or Path.cwd()
-    agents = discover_agents(root)
-    skills = discover_skills(root)
+    agents = discover_agents()
+    skills = discover_skills()
     routing = route(prompt, agents, skills)
     agent = routing.get("agent")
-    selected = routing.get("skills") or []
+    selected_skills = routing.get("skills") or []
 
-    parts = []
+    parts: list[str] = []
     if agent:
-        parts.append(f"# Agente: {agent.get('name')}")
+        parts.append(f"# Agente: {agent.get('name', agent.get('id'))}")
         parts.append(agent.get("instructions") or agent.get("description") or "")
-    for skill in selected:
-        parts.append(f"# Skill: {skill.get('name')}")
+    for skill in selected_skills:
+        parts.append(f"# Skill: {skill.get('name', skill.get('id'))}")
         parts.append(skill.get("instructions") or skill.get("description") or "")
     parts.append("---\n# Solicitação do usuário\n\n" + prompt.strip())
     instructions = "\n\n".join(p for p in parts if p)
 
     client = LLMClient(provider=provider)
-    response_text = ""
-    if client.mode == "api":
-        llm_resp = client.generate(prompt, system_prompt=instructions)
-        response_text = llm_resp.text if llm_resp.success else ""
+    llm = client.generate_sync(prompt, system_prompt=instructions)
 
     return {
         "agent": (agent or {}).get("name"),
         "agent_id": (agent or {}).get("id"),
-        "skills": [s.get("name") for s in selected],
+        "skills": [s.get("name") for s in selected_skills],
         "reason": routing.get("reason"),
         "instructions": instructions,
-        "mode": client.mode,
+        "response": llm.text if llm.mode == "api" and llm.success else None,
+        "mode": llm.mode,
         "provider": provider,
-        "response": response_text,
-        "providerResponse": response_text if response_text else None,
+        "providerResponse": llm.text if llm.mode == "api" and llm.success else None,
     }
