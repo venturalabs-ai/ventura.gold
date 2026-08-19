@@ -15,9 +15,11 @@ from ventura_gold.core.llm_client import LLMClient
 from ventura_gold.core.registry import discover_agents, discover_skills, list_adapters
 from ventura_gold.core.runtime import run_prompt
 from ventura_gold.core.validator import validate_all
-from ventura_gold.skills.code_generator import CodeGeneratorSkill
-from ventura_gold.skills.repository_analyst import RepositoryAnalystSkill
-from ventura_gold.skills.test_builder import TestBuilderSkill
+from ventura_gold.skills.codegen.generator import CodeGeneratorSkill
+from ventura_gold.skills.repository.analyst import RepositoryAnalystSkill
+from ventura_gold.skills.testing.builder import TestBuilderSkill
+from ventura_gold.skills.docs.generator import DocsGeneratorSkill
+from ventura_gold.skills.review.auditor import ReviewAuditorSkill
 
 app = typer.Typer(help="ventura.gold — Agente de Repositorio (local-first)", no_args_is_help=True)
 repo_app = typer.Typer(help="Analise e automacao de repositorio")
@@ -161,6 +163,20 @@ def generate_tests(
     if output and result.get("test_code"):
         output.write_text(result["test_code"], encoding="utf-8")
         typer.echo(f"Salvo em: {output}")
+
+
+@repo_app.command("docs")
+def repo_docs():
+    """Gera outline de documentacao do repositorio (offline)."""
+    skill = DocsGeneratorSkill(repo_path=Path.cwd())
+    typer.echo(skill.generate_readme_outline())
+
+
+@repo_app.command("review")
+def repo_review():
+    """Revisao/auditoria heuristica local do codigo."""
+    skill = ReviewAuditorSkill(repo_path=Path.cwd())
+    typer.echo(skill.report())
 
 
 def main() -> None:
