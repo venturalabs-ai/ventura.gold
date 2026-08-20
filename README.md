@@ -12,7 +12,7 @@
 - Optional multi-provider LLM client
 - Portable export package
 - CI with tests + secret pattern scan
-- **Novo: Ecossistema completo de Infoprodutos** (estratégia → conteúdo → copy → página → materiais → ads compliance)
+- **Ecossistema Infoproduto v2** — state machine completa (nicho → estrutura → copy/VSL → ads → compliance → bilingual → QA)
 
 ## Install
 
@@ -42,39 +42,47 @@ ventura-gold repo generate-tests --file src/ventura_gold/core/router.py
 ```text
 src/ventura_gold/
 ├── agents/                    # .md definitions
-│   └── ventura_infoproduto.md # Orquestrador de infoprodutos
+│   └── ventura_infoproduto.md
+├── infoproduto/               # ★ Ecossistema v2 (state machine)
+│   ├── orchestrator.py        # VenturaOrchestrator + todos os agentes
+│   ├── agents/                # versões refinadas (niche, product structure)
+│   ├── skills/                # skill JSONs de domínio
+│   └── README.md
 ├── skills/
-│   ├── repository/            # scan & analysis
-│   ├── codegen/               # code generation
-│   ├── testing/               # test generation
-│   ├── docs/                  # documentation
-│   ├── review/                # audit & review
-│   ├── infoproduto_criacao/   # Estratégia do produto
-│   ├── infoproduto_conteudo/  # Conteúdo didático
-│   ├── copywriting/           # Frameworks e componentes de copy
-│   ├── pagina_vendas/         # Página HTML + VSL
-│   ├── materiais_vendas/      # E-mail, WhatsApp, webinar, posts
-│   ├── ads_compliance/        # Criativos Meta/Google + compliance
-│   └── infoproduto/           # Orquestrador Python
+│   ├── repository/, codegen/, testing/, docs/, review/
+│   ├── infoproduto_criacao/, infoproduto_conteudo/, copywriting/
+│   ├── pagina_vendas/, materiais_vendas/, ads_compliance/
+│   └── infoproduto/           # wrapper de compatibilidade v1→v2
 ├── adapters/                  # 10 LLM adapters
 ├── mcp/                       # Git + filesystem tools
 ├── core/
 └── cli.py
 ```
 
-## Ecossistema Infoproduto
+## Ecossistema Infoproduto v2
 
-Pipeline completo para criar infoprodutos de alta conversão com compliance:
+```python
+from ventura_gold.infoproduto import VenturaOrchestrator, Language
 
-1. `infoproduto_criacao` → Estratégia (promessa, mecanismo, módulos, oferta)
-2. `infoproduto_conteudo` → Roteiros, exercícios, PDFs e bônus
-3. `copywriting` → AIDA, PAS, StoryBrand + headlines, bullets, FAQ
-4. `pagina_vendas` → HTML completo + VSL + seções de conversão
-5. `materiais_vendas` → Sequências de e-mail, WhatsApp, webinar, posts
-6. `ads_compliance` → Criativos Meta + Google com validação automática
-7. `review` → Auditoria final
+orch = VenturaOrchestrator()
+ctx = orch.start_session(user_id="user123", language=Language.PT_BR)
+ctx.nicho = "emagrecimento"
+ctx.dor_principal = "..."
+ctx = orch.run_full_pipeline(ctx)
+orch.export_deliverables(ctx, "./entregaveis")
+```
 
-Documentação detalhada: [docs/INFOPRODUTO_ECOSYSTEM.md](docs/INFOPRODUTO_ECOSYSTEM.md)
+**Pipeline (FlowState):**
+
+1. `niche_analysis` → NICHO_DEFINIDO  
+2. `product_structure` → ESTRUTURA_CRIADA  
+3. `sales_copy` → COPY_VSL_GERADA  
+4. `ads_creation` → ANUNCIOS_CRIADOS  
+5. `compliance` → COMPLIANCE_REVISADO  
+6. bilingual / source_validation / niche_ranking / qa / observability → PUBLISHED  
+
+Skills declarativas em `src/ventura_gold/skills/` (v1) continuam disponíveis.  
+Documentação: [docs/INFOPRODUTO_ECOSYSTEM.md](docs/INFOPRODUTO_ECOSYSTEM.md)
 
 ## License
 
