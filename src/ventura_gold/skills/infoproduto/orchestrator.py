@@ -1,26 +1,18 @@
 """
 Ventura Infoproduto — Orquestrador de pipeline completo.
-Integra as skills: criacao → conteudo → copywriting → pagina_vendas → materiais_vendas → ads_compliance → review
+Pipeline: criacao → conteudo → copywriting → pagina_vendas → materiais_vendas → ads_compliance → review
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 
 class VenturaInfoproduto:
     """
     Agente orquestrador para criação completa de infoprodutos.
-    Pipeline:
-    1. infoproduto_criacao
-    2. infoproduto_conteudo
-    3. copywriting
-    4. pagina_vendas
-    5. materiais_vendas
-    6. ads_compliance
-    7. review
     """
 
     name = "ventura_infoproduto"
-    version = "1.0.0"
+    version = "1.1.0"
     skills = [
         "infoproduto_criacao",
         "infoproduto_conteudo",
@@ -44,90 +36,61 @@ class VenturaInfoproduto:
             }
         return self.runtime.run_skill(skill_name, payload)
 
-    def offer_consistency_check(
-        self, estrategia: Dict[str, Any], pagina: Dict[str, Any], ads: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        promessa = estrategia.get("promessa_principal")
-        return {
-            "status": "ok",
-            "promessa_referencia": promessa,
-            "checks": [
-                "headline da página alinhada com a promessa principal",
-                "anúncios sem claims absolutos",
-                "CTA consistente entre landing page e ads",
-                "disclaimers obrigatórios presentes",
-            ],
-        }
-
     def run_pipeline(self, briefing: Dict[str, Any]) -> Dict[str, Any]:
+        # 1. Estratégia base
         estrategia = self.run_skill("infoproduto_criacao", briefing)
 
-        conteudo = self.run_skill(
-            "infoproduto_conteudo",
-            {
-                **briefing,
-                **(estrategia if isinstance(estrategia, dict) else {}),
-            },
-        )
+        # 2. Conteúdo do produto
+        conteudo = self.run_skill("infoproduto_conteudo", {
+            **briefing,
+            **(estrategia if isinstance(estrategia, dict) else {}),
+        })
 
-        copy = self.run_skill(
-            "copywriting",
-            {
-                **briefing,
-                **(estrategia if isinstance(estrategia, dict) else {}),
-                "oferta": estrategia.get("oferta_base") if isinstance(estrategia, dict) else None,
-                "objeções": estrategia.get("objeções_mapeadas") if isinstance(estrategia, dict) else None,
-                "prova_disponivel": briefing.get("prova_social_disponivel"),
-            },
-        )
+        # 3. Copywriting (necessário para página e materiais)
+        copy = self.run_skill("copywriting", {
+            **briefing,
+            **(estrategia if isinstance(estrategia, dict) else {}),
+            "oferta": estrategia.get("oferta_base") if isinstance(estrategia, dict) else None,
+            "objeções": estrategia.get("objeções_mapeadas") if isinstance(estrategia, dict) else None,
+            "prova_disponivel": briefing.get("prova_social_disponivel"),
+        })
 
-        pagina = self.run_skill(
-            "pagina_vendas",
-            {
-                **briefing,
-                **(estrategia if isinstance(estrategia, dict) else {}),
-                "copywriting_output": copy,
-                "oferta_completa": estrategia.get("oferta_base") if isinstance(estrategia, dict) else None,
-            },
-        )
+        # 4. Página de vendas
+        pagina = self.run_skill("pagina_vendas", {
+            **briefing,
+            **(estrategia if isinstance(estrategia, dict) else {}),
+            "copywriting_output": copy,
+            "oferta_completa": estrategia.get("oferta_base") if isinstance(estrategia, dict) else None,
+        })
 
-        materiais = self.run_skill(
-            "materiais_vendas",
-            {
-                **briefing,
-                **(estrategia if isinstance(estrategia, dict) else {}),
-                "copywriting_output": copy,
-                "pagina_vendas_output": pagina,
-                "oferta_completa": estrategia.get("oferta_base") if isinstance(estrategia, dict) else None,
-            },
-        )
+        # 5. Materiais de vendas (e-mail, WhatsApp, webinar, posts...)
+        materiais = self.run_skill("materiais_vendas", {
+            **briefing,
+            **(estrategia if isinstance(estrategia, dict) else {}),
+            "copywriting_output": copy,
+            "pagina_vendas_output": pagina,
+            "oferta_completa": estrategia.get("oferta_base") if isinstance(estrategia, dict) else None,
+        })
 
-        ads = self.run_skill(
-            "ads_compliance",
-            {
-                **briefing,
-                **(estrategia if isinstance(estrategia, dict) else {}),
-                "copywriting_output": copy,
-                "pagina_vendas_output": pagina,
-                "oferta_completa": estrategia.get("oferta_base") if isinstance(estrategia, dict) else None,
-            },
-        )
+        # 6. Anúncios + compliance
+        ads = self.run_skill("ads_compliance", {
+            **briefing,
+            **(estrategia if isinstance(estrategia, dict) else {}),
+            "copywriting_output": copy,
+            "pagina_vendas_output": pagina,
+            "oferta_completa": estrategia.get("oferta_base") if isinstance(estrategia, dict) else None,
+        })
 
-        consistencia = self.offer_consistency_check(estrategia, pagina, ads)
-
-        revisao = self.run_skill(
-            "review",
-            {
-                "briefing": briefing,
-                "estrategia": estrategia,
-                "conteudo": conteudo,
-                "copywriting": copy,
-                "pagina": pagina,
-                "materiais": materiais,
-                "ads": ads,
-                "consistencia": consistencia,
-            },
-        )
+        # 7. Review final
+        revisao = self.run_skill("review", {
+            "briefing": briefing,
+            "estrategia": estrategia,
+            "conteudo": conteudo,
+            "copywriting": copy,
+            "pagina": pagina,
+            "materiais": materiais,
+            "ads": ads,
+        })
 
         return {
             "agent": self.name,
@@ -136,9 +99,8 @@ class VenturaInfoproduto:
             "estrategia": estrategia,
             "conteudo": conteudo,
             "copywriting": copy,
-            "pagina_vendas": pagina,
-            "materiais_vendas": materiais,
+            "pagina": pagina,
+            "materiais": materiais,
             "ads": ads,
-            "consistencia": consistencia,
-            "review": revisao,
+            "revisao": revisao,
         }
