@@ -1,0 +1,20 @@
+{
+  "name": "bilingual_content_skill",
+  "version": "1.0.0",
+  "description": "Skill para tradução e adaptação cultural de todo conteúdo para PT-BR e EN-US",
+  "category": "domain",
+  "tags": ["bilingual", "translation", "pt-BR", "en-US"],
+  "author": "Ventura Labs AI",
+  "license": "MIT",
+  "inputs": {
+    "required": ["source_content", "source_language", "target_language", "nicho", "preserve_formatting"],
+    "optional": ["tone", "audience_locale"]
+  },
+  "outputs": ["translated_content", "cultural_notes", "glossary"],
+  "rules": [
+    "Adaptar culturalmente, não apenas traduzir literalmente",
+    "Manter tom de voz e frameworks de copy (AIDA/PAS)",
+    "Preservar placeholders e variáveis",
+    "Localizar exemplos, moeda e referências culturais"
+  ]
+}

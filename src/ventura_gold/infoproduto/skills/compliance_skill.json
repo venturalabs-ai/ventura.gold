@@ -1,0 +1,22 @@
+{
+  "name": "compliance_skill",
+  "version": "1.0.0",
+  "description": "Skill para validação de compliance Meta Ads/Google Ads para nichos de saúde, finanças, direito e geral",
+  "category": "domain",
+  "tags": ["compliance", "meta", "google", "ads", "health", "finance"],
+  "author": "Ventura Labs AI",
+  "license": "MIT",
+  "inputs": {
+    "required": ["texts_to_validate", "nicho", "sub_nicho", "language", "strict_mode"],
+    "optional": ["platform", "product_category"]
+  },
+  "outputs": ["compliance_results", "compliance_passed", "required_changes", "warnings"],
+  "rules": [
+    "Bloquear garantias absolutas de renda, lucro, saúde, emagrecimento",
+    "Bloquear antes/depois de corpo humano",
+    "Bloquear linguagem de atributo pessoal",
+    "Bloquear urgência falsa sem base real",
+    "Exigir disclaimers em nichos sensíveis",
+    "Validar limites de caracteres Google RSA"
+  ]
+}

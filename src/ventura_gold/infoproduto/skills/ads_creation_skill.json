@@ -1,0 +1,22 @@
+{
+  "name": "ads_creation_skill",
+  "version": "1.0.0",
+  "description": "Skill para criação de 5 variações de anúncios (roteiro vídeo + copy imagem) para Meta Ads e Google Ads",
+  "category": "domain",
+  "tags": ["ads", "meta", "google", "video", "copy"],
+  "author": "Ventura Labs AI",
+  "license": "MIT",
+  "inputs": {
+    "required": ["nome_produto", "headline", "vsl_script", "nicho", "dor_principal"],
+    "optional": ["promessa_principal", "oferta_detalhada", "language", "num_variations"]
+  },
+  "outputs": ["anuncios_meta", "anuncios_google", "video_scripts", "image_copies"],
+  "rules": [
+    "Gerar exatamente 5 variações por plataforma",
+    "Cada variação deve atacar um ângulo ou objeção diferente",
+    "Hooks de vídeo ≤ 3 segundos",
+    "Primary text Meta ≤ 125 caracteres recomendado para feed",
+    "Sem claims absolutos de renda/saúde",
+    "Sem linguagem de atributo pessoal proibida pelo Meta"
+  ]
+}
