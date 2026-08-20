@@ -1,0 +1,42 @@
+{
+  "name": "sales_copy_skill",
+  "version": "1.0.0",
+  "description": "Skill para escrita de copy de página de vendas (Headline, VSL Script, Oferta, Bônus, Garantia) usando AIDA/PAS",
+  "category": "domain",
+  "tags": ["copywriting", "vsl", "sales-page", "aida", "pas", "headline", "offer"],
+  "author": "Ventura Labs",
+  "license": "MIT",
+  "inputs": {
+    "nome_produto": {"type": "string", "required": true},
+    "promessa_principal": {"type": "string", "required": true},
+    "nicho": {"type": "string", "required": true},
+    "dor_principal": {"type": "string", "required": true},
+    "transformacao_desejada": {"type": "string", "required": true},
+    "audiencia_primaria": {"type": "string", "required": true},
+    "modulos": {"type": "array", "required": true},
+    "bonus": {"type": "array", "required": true},
+    "garantia": {"type": "string", "required": true},
+    "language": {"type": "string", "enum": ["pt-BR", "en-US"], "default": "pt-BR"}
+  },
+  "outputs": {
+    "headline": {"type": "string"},
+    "headline_variations": {"type": "array", "items": {"type": "string"}},
+    "vsl_script": {"type": "string"},
+    "vsl_sections": {"type": "object"},
+    "oferta_detalhada": {"type": "string"},
+    "faq_objections": {"type": "array"}
+  },
+  "frameworks": ["AIDA", "PAS", "Hero's Journey", "Before-After-Bridge"],
+  "compliance_rules": [
+    "Não prometer resultados específicos garantidos",
+    "Incluir disclaimer 'Resultados podem variar'",
+    "Não usar depoimentos falsos",
+    "Respeitar políticas de Meta Ads e Google Ads"
+  ],
+  "execution": {
+    "agent": "sales_copy_agent",
+    "timeout_seconds": 60,
+    "retry_attempts": 2
+  },
+  "dependencies": ["product_structure_skill"]
+}

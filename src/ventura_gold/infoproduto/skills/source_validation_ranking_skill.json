@@ -1,0 +1,30 @@
+{
+  "name": "source_validation_ranking_skill",
+  "version": "1.0.0",
+  "description": "Skill combinada para validação de fontes com nível de confiança + ranking visual de nicho Brasil/EUA com fontes recomendadas",
+  "category": "domain",
+  "tags": ["source-validation", "credibility", "ranking", "brazil", "usa", "market-data"],
+  "author": "Ventura Labs",
+  "license": "MIT",
+  "inputs": {
+    "sources_to_validate": {"type": "array", "required": false},
+    "nicho": {"type": "string", "required": true},
+    "sub_nicho": {"type": "string", "required": false},
+    "language": {"type": "string", "enum": ["pt-BR", "en-US"], "default": "pt-BR"},
+    "target_countries": {"type": "array", "default": ["BR", "US"]}
+  },
+  "outputs": {
+    "validated_sources": {"type": "array"},
+    "nicho_ranking": {"type": "object"},
+    "recommended_fonts": {"type": "object"},
+    "color_palette": {"type": "object"}
+  },
+  "credibility_criteria": ["domain_authority", "recency", "primary_source", "peer_review"],
+  "confidence_thresholds": {"ALTO": 0.8, "MEDIO": 0.5, "BAIXO": 0.0},
+  "execution": {
+    "agent": "source_validation",
+    "timeout_seconds": 45,
+    "retry_attempts": 2
+  },
+  "dependencies": ["niche_analysis_skill"]
+}
