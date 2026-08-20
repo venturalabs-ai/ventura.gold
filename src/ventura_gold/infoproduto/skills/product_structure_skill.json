@@ -1,0 +1,73 @@
+{
+  "name": "product_structure_skill",
+  "version": "1.0.0",
+  "description": "Skill para criação da estrutura completa do infoproduto (módulos, promessa, bônus, garantia)",
+  "category": "domain",
+  "tags": ["product-structure", "curriculum", "bonus", "guarantee", "pricing"],
+  "author": "Ventura Labs",
+  "license": "MIT",
+  "inputs": {
+    "nicho": {"type": "string", "required": true},
+    "sub_nicho": {"type": "string", "required": false},
+    "dor_principal": {"type": "string", "required": true},
+    "transformacao_desejada": {"type": "string", "required": true},
+    "audiencia_primaria": {"type": "string", "required": true},
+    "language": {"type": "string", "enum": ["pt-BR", "en-US"], "default": "pt-BR"},
+    "nicho_ranking": {"type": "object", "required": false}
+  },
+  "outputs": {
+    "nome_produto": {"type": "string", "description": "Nome comercial do produto"},
+    "promessa_principal": {"type": "string", "description": "Promessa principal de transformação"},
+    "modulos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "numero": {"type": "integer"},
+          "titulo": {"type": "string"},
+          "aulas": {"type": "integer"},
+          "duracao_min": {"type": "integer"},
+          "objetivo": {"type": "string"},
+          "entregaveis": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "bonus": {"type": "array", "items": {"type": "string"}, "description": "Lista de bônus com valores percebidos"},
+    "garantia": {"type": "string", "description": "Texto da garantia oferecida"},
+    "pricing_suggestion": {
+      "type": "object",
+      "properties": {
+        "price_br": {"type": "number"},
+        "price_us": {"type": "number"},
+        "installments": {"type": "integer"}
+      }
+    }
+  },
+  "frameworks": ["Value Ladder", "Bonus Stacking", "Risk Reversal"],
+  "compliance_rules": [
+    "Garantia deve ser real e cumprível",
+    "Bônus devem ter valor real demonstrável",
+    "Promessa deve ser baseada em resultados típicos, não excepcionais"
+  ],
+  "execution": {
+    "agent": "product_structure_agent",
+    "timeout_seconds": 45,
+    "retry_attempts": 2
+  },
+  "dependencies": ["niche_analysis_skill"],
+  "examples": [
+    {
+      "input": {
+        "nicho": "programação",
+        "dor_principal": "não sabem por onde começar",
+        "transformacao_desejada": "construir primeiro app completo",
+        "language": "pt-BR"
+      },
+      "expected_output": {
+        "nome_produto": "Programação Mastery",
+        "modulos_count": 5,
+        "bonus_count": 5
+      }
+    }
+  ]
+}

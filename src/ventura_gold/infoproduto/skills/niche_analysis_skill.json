@@ -1,0 +1,55 @@
+{
+  "name": "niche_analysis_skill",
+  "version": "1.0.0",
+  "description": "Skill para análise de nicho, audiência e dor principal usando frameworks AIDA/PAS",
+  "category": "domain",
+  "tags": ["niche", "audience", "pain-point", "aida", "pas", "market-research"],
+  "author": "Ventura Labs",
+  "license": "MIT",
+  "inputs": {
+    "nicho": {"type": "string", "required": true, "description": "Nicho principal do infoproduto"},
+    "sub_nicho": {"type": "string", "required": false, "description": "Sub-nicho específico"},
+    "audiencia_primaria": {"type": "string", "required": true, "description": "Descrição da audiência alvo"},
+    "dor_principal": {"type": "string", "required": true, "description": "Dor principal da audiência"},
+    "transformacao_desejada": {"type": "string", "required": true, "description": "Transformação que o produto entrega"},
+    "language": {"type": "string", "enum": ["pt-BR", "en-US"], "default": "pt-BR"}
+  },
+  "outputs": {
+    "nicho_ranking": {"type": "object", "description": "Ranking visual Brasil/EUA com métricas"},
+    "validation_questions": {"type": "array", "items": {"type": "string"}, "description": "Perguntas para validação se dados incompletos"},
+    "market_insights": {"type": "object", "description": "Insights de mercado coletados"}
+  },
+  "frameworks": ["AIDA", "PAS"],
+  "compliance_rules": [
+    "Não prometer resultados garantidos",
+    "Não usar linguagem médica sem disclaimer",
+    "Não fazer alegações financeiras não comprovadas"
+  ],
+  "execution": {
+    "agent": "niche_analysis_agent",
+    "timeout_seconds": 30,
+    "retry_attempts": 2
+  },
+  "dependencies": [],
+  "examples": [
+    {
+      "input": {
+        "nicho": "emagrecimento",
+        "sub_nicho": "mulheres 40+",
+        "audiencia_primaria": "Mulheres 40-55 anos, profissionais, sedentárias",
+        "dor_principal": "não conseguem emagrecer após os 40",
+        "transformacao_desejada": "perder 10kg em 90 dias",
+        "language": "pt-BR"
+      },
+      "expected_output": {
+        "nicho_ranking": {
+          "category": "saude_bem_estar",
+          "brazil_rank": 12,
+          "usa_rank": 8,
+          "brazil_search_volume": 45000,
+          "usa_search_volume": 180000
+        }
+      }
+    }
+  ]
+}
