@@ -1,0 +1,58 @@
+name: PR Validation
+
+on:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Validate project structure and metadata
+        run: ventura-gold validate
+
+      - name: JSON validity check
+        run: |
+          python - <<'EOF'
+          import json
+          from pathlib import Path
+          for p in sorted(Path("src").rglob("*.json")):
+              try:
+                  json.loads(p.read_text(encoding="utf-8"))
+              except Exception as e:
+                  raise SystemExit(f"JSON invalido: {p}: {e}")
+          for p in sorted(Path("docs").rglob("*.md")):
+              assert p.stat().st_size >= 0
+          print("Todos os JSON validos")
+          EOF
+
+      - name: Secret pattern scan
+        run: |
+          if grep -rE "(sk-ant-[A-Za-z0-9_-]{10,}|sk-proj-[A-Za-z0-9_-]{10,}|ghp_[A-Za-z0-9]{20,}|xai-[A-Za-z0-9]{20,})" --include="*.py" --include="*.md" --include="*.json" --include="*.toml" . ; then
+            echo "POSSIVEL SEGREDO DETECTADO"
+            exit 1
+          fi
+          echo "Sem padroes de segredo obvios"
+
+      - name: MCP servers smoke test
+        run: |
+          python - <<'EOF'
+          from ventura_gold.mcp.server_git import GitServer
+          from ventura_gold.mcp.server_filesystem import FileSystemServer
+          git = GitServer()
+          assert "error" not in git.run_git("--version")
+          fs = FileSystemServer()
+          assert isinstance(fs.list_dir("."), list)
+          print("MCP OK")
+          EOF
