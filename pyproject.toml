@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ventura.gold"
-version = "1.0.0"
+version = "1.1.0"
 description = "Agente de repositorio automatizado — 100% Python, local-first, MCP e integracao LLM opcional"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [{name = "Ventura Labs AI"}]
-keywords = ["ai-agents", "llm", "agent-framework", "local-first", "portable", "mcp", "repository"]
+keywords = ["ai-agents", "llm", "agent-framework", "local-first", "portable", "mcp", "repository", "infoproduto"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -36,7 +36,7 @@ ventura-gold = "ventura_gold.cli:app"
 where = ["src"]
 
 [tool.setuptools.package-data]
-ventura_gold = ["agents/*.md", "agents/*.json", "skills/**/*.md", "skills/**/*.json"]
+ventura_gold = ["agents/*.md", "agents/*.json", "skills/**/*.md", "skills/**/*.json", "infoproduto/**/*.md", "infoproduto/**/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
